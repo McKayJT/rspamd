@@ -2681,7 +2681,14 @@ rspamd_dkim_sign_key_load (const gchar *key, gsize len,
 		key = tmp;
 	}
 
-	if (type == RSPAMD_DKIM_KEY_RAW && len == 32) {
+	if (type == RSPAMD_DKIM_KEY_RAW && len == 64) {
+		nkey->type = RSPAMD_DKIM_KEY_EDDSA;
+		nkey->key.key_eddsa = g_malloc (
+				rspamd_cryptobox_sk_sig_bytes (RSPAMD_CRYPTOBOX_MODE_25519));
+		nkey->keylen = rspamd_cryptobox_sk_sig_bytes (RSPAMD_CRYPTOBOX_MODE_25519);
+		memcpy (nkey->key.key_eddsa, key, 64);
+	}
+	else if (type == RSPAMD_DKIM_KEY_RAW && len == 32) {
 		unsigned char pk[32];
 		nkey->type = RSPAMD_DKIM_KEY_EDDSA;
 		nkey->key.key_eddsa = g_malloc (
